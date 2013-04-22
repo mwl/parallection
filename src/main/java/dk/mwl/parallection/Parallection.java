@@ -3,14 +3,11 @@ package dk.mwl.parallection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class Parallection<T> {
     private final ExecutorService executor;
-    private final Vector<Future> futures = new Vector<>();
+    private final Vector<Future<T>> futures = new Vector<>();
     private final List<T> list = new ArrayList<>();
 
     private Parallection(List<T> list, int threads) {
@@ -24,20 +21,40 @@ public class Parallection<T> {
 
     public Parallection<T> foreach(final Action<T> action) {
         for (final T element : list) {
-            futures.add(executor.submit(new Runnable() {
+            futures.add(executor.submit(new Callable<T>() {
                 @Override
-                public void run() {
+                public T call() throws Exception {
                     action.action(element);
+                    return element;
                 }
             }));
         }
         return this;
     }
 
-    public void join() throws ExecutionException, InterruptedException {
-        for (Future future : futures) {
-            future.get();
+    public Parallection<T> join() throws ExecutionException, InterruptedException {
+        List<T> result = new ArrayList<>();
+        for (Future<T> future : futures) {
+            result.add(future.get());
         }
+        return parallection(result);
     }
 
+    /**
+     * TODO: As results arrive from parent run new runs should start
+     * @return
+     */
+    public Parallection<T> stream() {
+        throw new RuntimeException("Not yet implemented");
+    }
+
+    /**
+     * TODO:
+     * @param converter
+     * @param <N>
+     * @return
+     */
+    public <N> Parallection<N> convert(Convert<T, N> converter) {
+        throw new RuntimeException("Not yet implemented");
+    }
 }
