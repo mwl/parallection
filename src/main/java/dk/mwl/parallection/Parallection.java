@@ -8,21 +8,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class ParallectionFrom<T> {
+public class Parallection<T> {
     private final ExecutorService executor;
     private final Vector<Future> futures = new Vector<>();
     private final List<T> list = new ArrayList<>();
 
-    private ParallectionFrom(List<T> list, int threads) {
+    private Parallection(List<T> list, int threads) {
         this.list.addAll(list);
         executor = Executors.newFixedThreadPool(threads);
     }
 
-    public static <T> ParallectionFrom parallection(List<T> list) {
-        return new ParallectionFrom(list, 10);
+    public static <T> Parallection parallection(List<T> list) {
+        return new Parallection(list, 10);
     }
 
-    public ParallectionFrom<T> foreach(final Action<T> action) {
+    public Parallection<T> foreach(final Action<T> action) {
         for (final T element : list) {
             futures.add(executor.submit(new Runnable() {
                 @Override
@@ -39,4 +39,5 @@ public class ParallectionFrom<T> {
             future.get();
         }
     }
+
 }
