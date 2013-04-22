@@ -15,11 +15,15 @@ public class Parallection<T> {
 
     private Parallection(List<T> list, int threads) {
         this.list.addAll(list);
-        executor = Executors.newFixedThreadPool(threads);
+        executor = threads < 1 ? Executors.newSingleThreadExecutor() : Executors.newFixedThreadPool(threads);
     }
 
     public static <T> Parallection parallection(List<T> list) {
-        return new Parallection(list, 10);
+        return parallection(list, 10);
+    }
+
+    public static <T> Parallection parallection(List<T> list, int numberOfThreads) {
+        return new Parallection(list, numberOfThreads);
     }
 
     public Parallection<T> foreach(final Action<T> action) {
