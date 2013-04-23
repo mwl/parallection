@@ -38,9 +38,15 @@ public class Parallection<T> {
         return this;
     }
 
-    public void join() throws ExecutionException, InterruptedException {
+    public void join() {
         for (Future future : futures) {
-            future.get();
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                throw new ParallectionException("Future has been interrupted", e);
+            } catch (ExecutionException e) {
+                throw new ParallectionException("Execution failed", e);
+            }
         }
     }
 
