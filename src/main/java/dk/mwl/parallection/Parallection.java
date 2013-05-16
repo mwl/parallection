@@ -35,6 +35,7 @@ public class Parallection<T> {
                 }
             }));
         }
+        executor.shutdown();
         return this;
     }
 
